@@ -23,6 +23,17 @@
             background-color: #fff;
         }
 
+        #contact-box1 {
+            border: 1px solid #ccc;
+            padding: 20px;
+            width: 80%; /* ปรับขนาดกล่องให้เต็มหน้าจอของอุปกรณ์โทรศัพท์ */
+            max-width: 400px; /* จำกัดความกว้างสูงสุด */
+            margin: 20px auto;
+            text-align: center;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+            background-color: #fff;
+        }
+
         .link-box {
             border: 1px solid #ddd;
             padding: 10px;
@@ -75,10 +86,23 @@
     </style>
 </head>
 <body>
-    <section id="contact">
+    <section id="contact-box1">
+        <!-- กล่องลิงก์ที่มีอยู่แล้ว -->
+        <div class="link-box">
+            <a href="https://www.facebook.com/panuwat.takham.5" target="_blank">FB กูเอง</a>
+            <button class="delete-btn" onclick="deleteLink(0)">ลบ</button>
+        </div>
+        <div class="link-box">
+            <a href="https://www.canva.com/design/DAGJahiL_Zg/i0ty2kxvEt3z5baBMIeJiA/edit?utm_content=DAGJahiL_Zg&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton" target="_blank">canvaเช่ารถ</a>
+            <button class="delete-btn" onclick="deleteLink(0)">ลบ</button>
+        </div>
+        
+        <!-- กล่องลิงก์ที่จะเพิ่ม -->
         <div id="contact-box">
             <!-- ลิงก์ที่บันทึกไว้จะถูกเพิ่มที่นี่ -->
         </div>
+        
+        <!-- แบบฟอร์มเพิ่มลิงก์ -->
         <form id="add-link-form">
             <input type="text" id="link-url" placeholder="ใส่ URL ที่นี่">
             <input type="text" id="link-name" placeholder="ใส่ชื่อของลิงก์ที่นี่">
@@ -86,6 +110,7 @@
         </form>
     </section>
 
+    <!-- สคริปต์ JavaScript -->
     <script>
         // ฟังก์ชั่นสำหรับโหลดลิงก์ที่บันทึกไว้จาก Local Storage
         function loadLinks() {
@@ -111,11 +136,12 @@
             });
         }
 
-        // ฟังก์ชั่นสำหรับบันทึกลิงก์ใหม่
+        // ฟังก์ชั่นสำหรับบันทึกลิงก์ใหม่ลงใน Local Storage และแสดงผลทันที
         function saveLink(url, name) {
             const links = JSON.parse(localStorage.getItem('links')) || [];
             links.push({ url, name });
             localStorage.setItem('links', JSON.stringify(links));
+            loadLinks();
         }
 
         // ฟังก์ชั่นสำหรับลบลิงก์
@@ -133,13 +159,13 @@
             }
         }
 
+        // เมื่อส่งแบบฟอร์มเพิ่มลิงก์
         document.getElementById('add-link-form').addEventListener('submit', function(event) {
             event.preventDefault();
             const url = document.getElementById('link-url').value;
             const name = document.getElementById('link-name').value || url; // ใช้ชื่อ URL ถ้าไม่ใส่ชื่อ
             if (url) {
                 saveLink(url, name);
-                loadLinks();
                 document.getElementById('link-url').value = '';
                 document.getElementById('link-name').value = '';
             }
