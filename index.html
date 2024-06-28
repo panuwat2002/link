@@ -18,6 +18,7 @@
             padding: 10px;
             margin: 10px 0;
             box-shadow: 1px 1px 5px rgba(0,0,0,0.1);
+            position: relative;
         }
         .link-box a {
             text-decoration: none;
@@ -26,6 +27,16 @@
         }
         .link-box a:hover {
             color: #007BFF;
+        }
+        .delete-btn {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background: #ff4d4d;
+            border: none;
+            color: white;
+            padding: 5px;
+            cursor: pointer;
         }
         form {
             margin-top: 20px;
@@ -41,10 +52,7 @@
 <body>
     <section id="contact">
         <div id="contact-box">
-            <div class="link-box">
-                <a href="https://www.facebook.com/panuwat.takham.5">FB ผมเอง</a>
-            </div>
-            <!-- เพิ่มกล่องลิงก์อื่นๆ ที่นี่ -->
+            <!-- ลิงก์ที่บันทึกไว้จะถูกเพิ่มที่นี่ -->
         </div>
         <form id="add-link-form">
             <input type="text" id="link-url" placeholder="ใส่ URL ที่นี่">
@@ -54,11 +62,12 @@
     </section>
 
     <script>
-        document.getElementById('add-link-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const url = document.getElementById('link-url').value;
-            const name = document.getElementById('link-name').value || url; // ใช้ชื่อ URL ถ้าไม่ใส่ชื่อ
-            if (url) {
+        // ฟังก์ชั่นสำหรับโหลดลิงก์ที่บันทึกไว้จาก Local Storage
+        function loadLinks() {
+            const contactBox = document.getElementById('contact-box');
+            contactBox.innerHTML = ''; // เคลียร์เนื้อหาก่อน
+            const links = JSON.parse(localStorage.getItem('links')) || [];
+            links.forEach(({ url, name }, index) => {
                 const linkBox = document.createElement('div');
                 linkBox.className = 'link-box';
 
@@ -66,13 +75,53 @@
                 link.href = url;
                 link.textContent = name;
 
-                linkBox.appendChild(link);
-                document.getElementById('contact-box').appendChild(linkBox);
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'ลบ';
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.addEventListener('click', () => deleteLink(index));
 
+                linkBox.appendChild(link);
+                linkBox.appendChild(deleteBtn);
+                contactBox.appendChild(linkBox);
+            });
+        }
+
+        // ฟังก์ชั่นสำหรับบันทึกลิงก์ใหม่
+        function saveLink(url, name) {
+            const links = JSON.parse(localStorage.getItem('links')) || [];
+            links.push({ url, name });
+            localStorage.setItem('links', JSON.stringify(links));
+        }
+
+        // ฟังก์ชั่นสำหรับลบลิงก์
+        function deleteLink(index) {
+            const password = prompt('กรุณาใส่รหัสผ่านเพื่อลบลิงก์:');
+            const correctPassword = 'panuwat'; // เปลี่ยนรหัสผ่านที่นี่
+
+            if (password === correctPassword) {
+                const links = JSON.parse(localStorage.getItem('links')) || [];
+                links.splice(index, 1);
+                localStorage.setItem('links', JSON.stringify(links));
+                loadLinks();
+            } else {
+                alert('รหัสผ่านไม่ถูกต้อง');
+            }
+        }
+
+        document.getElementById('add-link-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const url = document.getElementById('link-url').value;
+            const name = document.getElementById('link-name').value || url; // ใช้ชื่อ URL ถ้าไม่ใส่ชื่อ
+            if (url) {
+                saveLink(url, name);
+                loadLinks();
                 document.getElementById('link-url').value = '';
                 document.getElementById('link-name').value = '';
             }
         });
+
+        // โหลดลิงก์ที่บันทึกไว้เมื่อเริ่มต้น
+        loadLinks();
     </script>
 </body>
 </html>
